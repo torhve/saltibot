@@ -1,5 +1,4 @@
 import salt.utils.event
-import pprint
 import os
 
 class Isea(object):

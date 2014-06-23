@@ -1,0 +1,6 @@
+irc:
+    channel: '#salt'
+    server: irc.idrift.no
+    port: 6669
+    nick: salt
+    password: rot13
