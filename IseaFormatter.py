@@ -8,12 +8,27 @@ def IseaFormatter(data):
         success = 'FAIL!'
         if data['success']:
             success = 'SUCCESS!'
-        line = "[{}] {} {} {} {}".format(
+
+
+        if type(data['return']) == type({}):
+            ok = 0
+            failed = 0
+            for k,v in data['return'].items():
+                if v['result']:
+                    ok += 1
+                else:
+                    failed += 1
+            result = "OK:{} Failed:{}".format(ok, failed)
+        else:
+            result = data['return']
+
+        line = "[{}] {} {} {} {} {}".format(
                 jid,
                 data['fun'],
                 ','.join(data['fun_args']),
                 data['id'],
-                success
+                success,
+                result
                 )
     else:
         line = "[{}] {} {} {} {}".format(
