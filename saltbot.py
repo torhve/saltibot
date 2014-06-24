@@ -39,6 +39,7 @@ class ircProtocol(irc.IRCClient):
 
     nickname = config['irc']['nick']
     password = config['irc']['password']
+    eventlistener = False
 
     def printResult(self, result):
         self.msg(config['irc']['channel'], result)
@@ -64,6 +65,10 @@ class ircProtocol(irc.IRCClient):
         ircoutput = self.msg
         self.join(config['irc']['channel'])
         self.factory.client = self
+        # Start reactor
+        if not self.eventlistener:
+            reactor.callInThread(salteventlistener, self)
+            self.eventlistener = True
 
     def joined(self, channel):
         """This will get called when the bot joins the channel."""
@@ -73,7 +78,6 @@ class ircProtocol(irc.IRCClient):
         self.msg(channel, 'Be greeted. I return from the dead.')
         #bot = self
         #self.salteventthread = thread.start_new_thread(salteventlistener, (self,))
-        reactor.callInThread(salteventlistener, self)
         #reactor.callFromThread(salteventlistener, self)
 
     def privmsg(self, user, channel, msg):
