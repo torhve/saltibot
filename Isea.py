@@ -2,8 +2,11 @@ import salt.utils.event
 import os
 
 class Isea(object):
-    filters = []
-
+    def __init__(self):
+        self.filters = []
+        self.jidsin = []
+        self.jidsout = []
+    
     def add_filter(self, filter):
         self.filters.append(filter)
 
@@ -15,15 +18,27 @@ class Isea(object):
         
         while True:
             ret = event.get_event(full=True)
-            
+
             if ret is None:
                 continue
             
             data = ret.get('data', False)
-
+            
             if data is None:
                 continue
-            
+           
+            if 'jid' in data.keys():
+                if 'return' in data.keys():
+                    if (data['jid'], data['id']) in self.jidsin:
+                        continue
+                    else:
+                        self.jidsin.append((data['jid'], data['id']))
+                else:
+                    if data['jid'] in self.jidsout:
+                        continue
+                    else:
+                        self.jidsout.append(data['jid'])
+
             has_returned = False
 
             for f in self.filters:
