@@ -1,1 +1,4 @@
+*.log
+*.pid
+*_test.*
 *.pyc
