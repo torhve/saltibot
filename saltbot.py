@@ -29,8 +29,10 @@ def salteventlistener(bot):
         bot.msg(config['irc']['channel'], IseaFormatter(data), length=400)
 
     isea = Isea()
+    # TODO:
+    # support more elaborate filtering
     f2 = IseaFilter('Fun')
-    f2.add_filter('fun', ['state.sls','test.ping', 'test.version', 'state.highstate'])
+    f2.add_filter('fun', config['filters']['functions'])
     isea.add_filter(f2)
     isea.listen('master', '/var/run/salt', output)
 

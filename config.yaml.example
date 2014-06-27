@@ -4,3 +4,10 @@ irc:
     port: 6669
     nick: salt
     password: rot13
+
+filters:
+    functions:
+        - state.sls
+        - test.ping
+        - test.version
+        - state.highstate
