@@ -1,0 +1,6 @@
+irc:
+    channel: '#nacl'
+    server: irc.company.com
+    port: 6669
+    nick: salt
+    password: rot13
