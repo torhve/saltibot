@@ -2,3 +2,4 @@
 *.pid
 *_test.*
 *.pyc
+config.yaml
