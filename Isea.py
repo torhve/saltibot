@@ -19,7 +19,7 @@ class Isea(object):
         while True:
             ret = event.get_event(full=True)
 
-            while len(self.jidsin) > 10:
+            while len(self.jidsin) > 1000:
                 self.jidsin.pop()
 
             while len(self.jidsout) > 10:
