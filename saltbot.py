@@ -22,7 +22,7 @@ import threading
 
 import thread, os, time, sys, string
 
-config = safe_load(file('config_test.yaml').read())
+config = safe_load(file('config.yaml').read())
 
 GreenColor = '\x033,1'
 YellowColor = '\x038,1'
