@@ -11,3 +11,6 @@ filters:
         - test.ping
         - test.version
         - state.highstate
+
+salt:
+    target: 'master'

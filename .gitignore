@@ -2,4 +2,5 @@
 *.pid
 *_test.*
 *.pyc
+*.swp
 config.yaml

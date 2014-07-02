@@ -49,7 +49,7 @@ def salteventlistener(bot, run):
     f2.add_filter('fun', config['filters']['functions'])
     isea.add_filter(f2)
     bot.msg(config['irc']['channel'], 'Isea object: {}'.format(isea))
-    isea.listen('master', '/var/run/salt', output, run)
+    isea.listen(config['salt']['target'], '/var/run/salt', output, run)
 
 class ircProtocol(irc.IRCClient):
     """A logging IRC bot."""
