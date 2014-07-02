@@ -27,7 +27,6 @@ config = safe_load(file('config.yaml').read())
 GreenColor = '\x033,1'
 YellowColor = '\x038,1'
 RedColor = '\x034,1'
-ircoutput = None
 
 def clearcache():
     isea_files = ['isea.py', 'iseaformatter.py', 'iseafilter.py']
@@ -82,7 +81,6 @@ class ircProtocol(irc.IRCClient):
 
     def signedOn(self):
         """Called when bot has succesfully signed on to server."""
-        ircoutput = self.msg
         self.join(config['irc']['channel'])
         self.factory.client = self
         # Start reactor
