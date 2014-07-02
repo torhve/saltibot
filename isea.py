@@ -1,6 +1,16 @@
 import salt.utils.event
 import os
 
+class IseaController(object):
+    def __init__(self, run):
+        self.run = run
+    
+    def get(self):
+        return self.run
+
+    def set(self, bool):
+        self.run = bool
+
 class Isea(object):
     def __init__(self):
         self.filters = []
@@ -11,12 +21,16 @@ class Isea(object):
         self.filters.append(filter)
 
     def listen(self, node, socket, callback_func):
+        listen(self, node, socket, callback_func, True)
+
+    def listen(self, node, socket, callback_func, controller):
         print('Listening with {0} filters'.format(len(self.filters)))
 
         sock = os.path.join(socket, node)
         event = salt.utils.event.SaltEvent(node, sock)
         
-        while True:
+        while controller.get():
+            print('Heartbeat!-!')
             ret = event.get_event(full=True)
 
             while len(self.jidsin) > 1000:
