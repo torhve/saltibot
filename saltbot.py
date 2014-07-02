@@ -107,7 +107,7 @@ class ircProtocol(irc.IRCClient):
         user = user.split('!', 1)[0]
         #self.logger.log("<%s> %s" % (user, msg))
 
-        if '!stop' in msg:
+        if msg == '!stop':
             if not self.run.get():
                 self.msg(channel, 'ISEA is not running!')
                 return
@@ -120,8 +120,7 @@ class ircProtocol(irc.IRCClient):
         
             self.msg(channel, 'Stopped ISEA!')
             return
-
-        if '!start' in msg:
+        elif msg == '!start':
             if self.run.get():
                 self.msg(channel, 'ISEA is already running!')
                 return
@@ -132,8 +131,7 @@ class ircProtocol(irc.IRCClient):
             self.isea_thread.start()
             self.msg(channel, 'Started ISEA!')
             return
-
-        if '!reload' in msg:
+        elif msg == '!reload':
             self.msg(channel, 'Reloading ISEA!')
             self.run.set(False)
             
