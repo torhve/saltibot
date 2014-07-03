@@ -5,18 +5,10 @@
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, threads
-from twisted.python import log, rebuild
-from twisted.python.filepath import FilePath
+from twisted.python import log
 from twisted.internet import threads
 from twisted.internet.protocol import Protocol
 from twisted.application import internet, service
-import isea
-import iseafilter
-import iseaformatter
-from isea import Isea
-from isea import IseaController
-from iseafilter import IseaFilter
-from iseaformatter import IseaFormatter
 from yaml import safe_load
 import threading
 
@@ -28,16 +20,17 @@ GreenColor = '\x033,1'
 YellowColor = '\x038,1'
 RedColor = '\x034,1'
 
-def clearcache():
-    isea_files = ['isea.py', 'iseaformatter.py', 'iseafilter.py']
-
-    for f in isea_files:
-        fp = FilePath(f)
-        bc = fp.sibling(string.join([string.split(f, '.')[0], '.pyc'], ''))
-        if bc.exists():
-            bc.remove()
-
 def salteventlistener(bot, run):
+    import isea
+    import iseafilter
+    import iseaformatter
+    # Reload code on every thread start
+    reload(isea)
+    reload(iseafilter)
+    reload(iseaformatter)
+    from isea import Isea
+    from iseafilter import IseaFilter
+    from iseaformatter import IseaFormatter
     def output(data):
         bot.msg(config['irc']['channel'], IseaFormatter(data), length=400)
 
@@ -57,8 +50,19 @@ class ircProtocol(irc.IRCClient):
     password = config['irc']['password']
     
     def __init__(self):
+        self.start()
+
+    def start(self):
+        from isea import IseaController
         self.run = IseaController(True)
         self.isea_thread = threading.Thread(target=salteventlistener, args=(self,self.run,))
+        self.isea_thread.start()
+
+    def stop(self):
+        self.run.set(False)
+
+    def running(self):
+        return self.isea_thread.isAlive()
 
     def printResult(self, result):
         self.msg(config['irc']['channel'], result)
@@ -85,10 +89,8 @@ class ircProtocol(irc.IRCClient):
         self.factory.client = self
         # Start reactor
         
-        if not self.isea_thread.isAlive():
-            print('Starting ISEA thread')
-            self.isea_thread.start()
-            print('Started ISEA thread')
+        if not self.running():
+            self.start()
 
     def joined(self, channel):
         """This will get called when the bot joins the channel."""
@@ -103,48 +105,34 @@ class ircProtocol(irc.IRCClient):
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message."""
         user = user.split('!', 1)[0]
-        #self.logger.log("<%s> %s" % (user, msg))
+        log.msg("<%s> %s" % (user, msg))
 
         if msg == '!stop':
-            if not self.run.get():
-                self.msg(channel, 'ISEA is not running!')
+            if not self.running():
                 return
 
-            self.msg(channel, 'Stopping ISEA!')
-            self.run.set(False)
-            
-            while self.isea_thread.isAlive():
+            self.stop()
+            while self.running():
+                ''' Waiting for event listen loop to to terminate'''
                 pass
-        
             self.msg(channel, 'Stopped ISEA!')
             return
         elif msg == '!start':
-            if self.run.get():
+            if self.running():
                 self.msg(channel, 'ISEA is already running!')
                 return
-
-            self.msg(channel, 'Starting ISEA!')
-            self.run.set(True)
-            self.isea_thread = threading.Thread(target=salteventlistener, args=(self,self.run,))
-            self.isea_thread.start()
-            self.msg(channel, 'Started ISEA!')
+            else:
+                self.start()
+                self.msg(config['irc']['channel'], 'Started ISEA!')
             return
         elif msg == '!reload':
             self.msg(channel, 'Reloading ISEA!')
-            self.run.set(False)
+            self.stop()
             
-            while self.isea_thread.isAlive():
+            while self.running():
                 pass
 
-            clearcache()
-
-            rebuild.rebuild(isea)
-            rebuild.rebuild(iseafilter)
-            rebuild.rebuild(iseaformatter)
-
-            self.run.set(True)
-            self.isea_thread = threading.Thread(target=salteventlistener, args=(self,self.run,))
-            self.isea_thread.start()
+            self.start()
             self.msg(channel, 'Reloaded ISEA!')
             return
 

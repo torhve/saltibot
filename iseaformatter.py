@@ -26,7 +26,7 @@ def IseaFormatter(data):
         if 'fun_args' in data.keys():
             fun_args = data['fun_args']
 
-        line = "[{}] {} {} {} {} {}".format(
+        line = "\002[{}]\002 {} {} {} {} {}".format(
                 jid,
                 data['fun'],
                 ','.join(fun_args),
@@ -35,7 +35,7 @@ def IseaFormatter(data):
                 result
                 )
     else:
-        line = "[{}] {} {} {} {}".format(
+        line = "\002[{}]\002 {} {} {} {}".format(
                 jid,
                 data['fun'],
                 ','.join(data['arg']),
